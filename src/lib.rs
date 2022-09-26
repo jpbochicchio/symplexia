@@ -1,3 +1,6 @@
+#[path = "homology/barcodes/intervals.rs"]
+mod intervals;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
