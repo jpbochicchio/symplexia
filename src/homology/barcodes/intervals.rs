@@ -1,5 +1,6 @@
 pub mod intervals {
-    use std::fmt::Debug;
+    use core::cmp::Ordering::*;
+    use std::{fmt::Debug, ops::Sub};
 
     const UID: i64 = -3434702188482864510;
 
@@ -16,7 +17,7 @@ pub mod intervals {
 
     impl<T> Interval<T>
     where
-        T: PartialEq + PartialOrd,
+        T: PartialEq + PartialOrd + Clone + Debug,
     {
         pub fn new(
             start: Option<T>,
@@ -93,8 +94,7 @@ pub mod intervals {
             if !self.is_left_infinite {
                 if self.is_left_closed && &point < self.start.as_ref().unwrap_or(&point) {
                     return false;
-                } else if !self.is_left_closed && &point <= self.start.as_ref().unwrap_or(&point)
-                {
+                } else if !self.is_left_closed && &point <= self.start.as_ref().unwrap_or(&point) {
                     return false;
                 }
             }
@@ -113,7 +113,7 @@ pub mod intervals {
 
     impl<T> Debug for Interval<T>
     where
-        T: PartialEq + PartialOrd + Debug + Clone + Default,
+        T: PartialEq + PartialOrd + Debug + Clone,
     {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             let mut left_interval_symbol: &str = "";
@@ -150,6 +150,32 @@ pub mod intervals {
                 "{}{}, {}{}",
                 left_interval_symbol, left_value_str, right_interval_symbol, right_value_str
             );
+        }
+    }
+
+    impl<T> PartialOrd for Interval<T>
+    where
+        T: PartialEq + PartialOrd + Sub<Output = T> + Clone + Debug,
+    {
+        fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+            // Infinite cases
+            if self.clone().is_infinite() && other.clone().is_infinite() {
+                return Some(Equal);
+            }
+
+            if self.clone().is_infinite() {
+                return Some(Greater);
+            }
+
+            if other.clone().is_infinite() {
+                return Some(Less);
+            }
+
+            // Finite cases
+            let l_0: T = self.end.clone().unwrap() - self.start.clone().unwrap();
+            let l_1: T = other.end.clone().unwrap() - other.start.clone().unwrap();
+
+            return l_0.partial_cmp(&l_1);
         }
     }
 }
