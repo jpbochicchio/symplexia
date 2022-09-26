@@ -89,8 +89,25 @@ pub mod intervals {
             self.is_left_infinite || self.is_right_infinite
         }
 
-        pub fn contains_point(point: T) -> bool {
-            todo!();
+        pub fn contains_point(&self, point: T) -> bool {
+            if !self.is_left_infinite {
+                if self.is_left_closed && &point < self.start.as_ref().unwrap_or(&point) {
+                    return false;
+                } else if !self.is_left_closed && &point <= self.start.as_ref().unwrap_or(&point)
+                {
+                    return false;
+                }
+            }
+
+            if !self.is_right_infinite {
+                if self.is_right_closed && &point > self.end.as_ref().unwrap_or(&point) {
+                    return false;
+                } else if !self.is_right_closed && &point >= self.end.as_ref().unwrap_or(&point) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
@@ -131,7 +148,7 @@ pub mod intervals {
             return write!(
                 f,
                 "{}{}, {}{}",
-                left_interval_symbol, &left_value_str, right_interval_symbol, &right_value_str
+                left_interval_symbol, left_value_str, right_interval_symbol, right_value_str
             );
         }
     }
