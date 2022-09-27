@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub mod intervals {
     use core::cmp::Ordering::*;
     use std::{fmt::Debug, ops::Sub};
@@ -116,10 +118,10 @@ pub mod intervals {
         T: PartialEq + PartialOrd + Debug + Clone,
     {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let mut left_interval_symbol: &str = "";
-            let mut left_value_str: String = String::from("");
-            let mut right_interval_symbol: &str = "";
-            let mut right_value_str: String = String::from("");
+            let left_interval_symbol: &str;
+            let left_value_str: String;
+            let right_interval_symbol: &str;
+            let right_value_str: String;
 
             if self.is_left_closed {
                 left_interval_symbol = "[";
