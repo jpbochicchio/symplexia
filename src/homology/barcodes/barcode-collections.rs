@@ -12,10 +12,12 @@ pub mod barcode_collections {
         persistence_invariant_descriptor: PersistenceInvariantDescriptor<Interval<T>, G>,
     }
 
+    // JavaPlex implements a few more methods, but they are never called
+    // Hence, we will omit them here
     impl<T, G> AnnotatedBarcodeCollection<T, G>
     where
         T: Clone + Debug + PartialEq + PartialOrd,
-        G: Clone + Debug,
+        G: Clone + Debug + Default,
     {
         pub fn new(
             use_left_closed_default: bool,
@@ -86,7 +88,13 @@ pub mod barcode_collections {
             return result;
         }
 
-        pub fn add_interval(&mut self, dimension: u32, start: T, end: T, generating_cycle: G) {
+        pub fn add_interval(
+            &mut self,
+            dimension: u32,
+            start: T,
+            end: T,
+            generating_cycle: Option<G>,
+        ) {
             self.persistence_invariant_descriptor.add_interval(
                 dimension,
                 Interval::new(
@@ -97,7 +105,7 @@ pub mod barcode_collections {
                     false,
                     false,
                 ),
-                generating_cycle,
+                generating_cycle.unwrap_or_default(),
             );
         }
 
@@ -105,7 +113,7 @@ pub mod barcode_collections {
             &mut self,
             dimension: u32,
             start: T,
-            generating_cycle: G,
+            generating_cycle: Option<G>,
         ) {
             self.persistence_invariant_descriptor.add_interval(
                 dimension,
@@ -117,11 +125,16 @@ pub mod barcode_collections {
                     false,
                     true,
                 ),
-                generating_cycle,
+                generating_cycle.unwrap_or_default(),
             );
         }
 
-        pub fn add_left_infinite_interval(&mut self, dimension: u32, end: T, generating_cycle: G) {
+        pub fn add_left_infinite_interval(
+            &mut self,
+            dimension: u32,
+            end: T,
+            generating_cycle: Option<G>,
+        ) {
             self.persistence_invariant_descriptor.add_interval(
                 dimension,
                 Interval::new(
@@ -132,7 +145,7 @@ pub mod barcode_collections {
                     true,
                     false,
                 ),
-                generating_cycle,
+                generating_cycle.unwrap_or_default(),
             );
         }
     }
@@ -140,13 +153,67 @@ pub mod barcode_collections {
     impl<T, G> Default for AnnotatedBarcodeCollection<T, G>
     where
         T: Clone + Debug + PartialEq + PartialOrd,
-        G: Clone + Debug,
+        G: Clone + Debug + Default,
     {
         fn default() -> Self {
             Self {
                 use_left_closed_default: true,
                 use_right_closed_default: false,
                 persistence_invariant_descriptor: PersistenceInvariantDescriptor::new(),
+            }
+        }
+    }
+
+    pub struct BarcodeCollection<T, G> {
+        annotated_collection: AnnotatedBarcodeCollection<T, G>,
+    }
+
+    // The JavaPlex version of this struct is only parameterized by a single generic, but I am not sure
+    // how to achieve this in Rust. Would need some high level type that could stand in for G. As a side
+    // effect, I'm not sure how to implement the "forgetGeneratorType" method from the JavaPlex class.
+    impl<T, G> BarcodeCollection<T, G>
+    where
+        T: Clone + Debug + PartialEq + PartialOrd,
+        G: Clone + Debug + Default,
+    {
+        pub fn new(annotated_collection: AnnotatedBarcodeCollection<T, G>) -> Self {
+            Self {
+                annotated_collection,
+            }
+        }
+
+        pub fn add_interval(&mut self, dimension: u32, start: T, end: T) {
+            self.annotated_collection
+                .add_interval(dimension, start, end, None::<G>);
+        }
+
+        pub fn add_right_infinite_interval(&mut self, dimension: u32, start: T) {
+            self.annotated_collection
+                .add_right_infinite_interval(dimension, start, None::<G>);
+        }
+
+        pub fn add_left_infinite_interval(&mut self, dimension: u32, end: T) {
+            self.annotated_collection
+                .add_left_infinite_interval(dimension, end, None::<G>);
+        }
+
+        pub fn add_direct_interval(&mut self, dimension: u32, direct_interval: Interval<T>) {
+            self.add_interval(
+                dimension,
+                direct_interval.clone().get_start().unwrap(),
+                direct_interval.get_end().unwrap().clone(),
+            );
+        }
+    }
+
+    impl<T, G> Default for BarcodeCollection<T, G>
+    where
+        T: Clone + Debug + PartialEq + PartialOrd,
+        G: Clone + Debug + Default,
+    {
+        fn default() -> Self {
+            Self {
+                annotated_collection: AnnotatedBarcodeCollection::default(),
             }
         }
     }

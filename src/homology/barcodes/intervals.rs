@@ -94,6 +94,14 @@ pub mod intervals {
             self.is_left_infinite || self.is_right_infinite
         }
 
+        pub fn get_start(self) -> Option<T> {
+            return self.start;
+        }
+
+        pub fn get_end(self) -> Option<T> {
+            return self.end;
+        }
+
         pub fn contains_point(&self, point: T) -> bool {
             if !self.is_left_infinite {
                 if self.is_left_closed && &point < self.start.as_ref().unwrap_or(&point) {
