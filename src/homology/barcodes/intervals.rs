@@ -1,8 +1,10 @@
 #![allow(dead_code)]
-
 pub mod intervals {
     use core::cmp::Ordering::*;
-    use std::{fmt::{Debug, Display}, ops::Sub};
+    use std::{
+        fmt::{Debug, Display},
+        ops::Sub,
+    };
 
     const UID: i64 = -3434702188482864510;
 
@@ -92,6 +94,14 @@ pub mod intervals {
             self.is_left_infinite || self.is_right_infinite
         }
 
+        pub fn get_start(self) -> Option<T> {
+            return self.start;
+        }
+
+        pub fn get_end(self) -> Option<T> {
+            return self.end;
+        }
+
         pub fn contains_point(&self, point: T) -> bool {
             if !self.is_left_infinite {
                 if self.is_left_closed && &point < self.start.as_ref().unwrap_or(&point) {
@@ -148,7 +158,10 @@ pub mod intervals {
         }
     }
 
-    impl<T> Display for Interval<T> where T: Clone + Debug {
+    impl<T> Display for Interval<T>
+    where
+        T: Clone + Debug,
+    {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             let left_interval_symbol: &str;
             let left_value_str: String;
@@ -201,19 +214,40 @@ mod tests {
         let finite_open_interval: Interval<i32> = Interval::finite_open_interval(-10, 10);
 
         let left_infinite_open_interval: Interval<i32> = Interval::left_infinite_open_interval(10);
-        let right_infinite_open_interval: Interval<i32> = Interval::right_infinite_open_interval(10);
-        let left_infinite_closed_interval: Interval<i32> = Interval::left_infinite_closed_interval(10);
-        let right_infinite_closed_interval: Interval<i32> = Interval::right_infinite_closed_interval(10);
+        let right_infinite_open_interval: Interval<i32> =
+            Interval::right_infinite_open_interval(10);
+        let left_infinite_closed_interval: Interval<i32> =
+            Interval::left_infinite_closed_interval(10);
+        let right_infinite_closed_interval: Interval<i32> =
+            Interval::right_infinite_closed_interval(10);
 
-        assert_eq!(finite_left_open_interval.to_string(), String::from("(2, 5]"));
-        assert_eq!(finite_right_open_interval.to_string(), String::from("[3, 6)"));
+        assert_eq!(
+            finite_left_open_interval.to_string(),
+            String::from("(2, 5]")
+        );
+        assert_eq!(
+            finite_right_open_interval.to_string(),
+            String::from("[3, 6)")
+        );
         assert_eq!(finite_closed_interval.to_string(), String::from("[-2, 3]"));
         assert_eq!(finite_open_interval.to_string(), String::from("(-10, 10)"));
 
-        assert_eq!(left_infinite_open_interval.to_string(), String::from("(-infinity, 10)"));
-        assert_eq!(right_infinite_open_interval.to_string(), String::from("(10, infinity)"));
-        assert_eq!(left_infinite_closed_interval.to_string(), String::from("[-infinity, 10]"));
-        assert_eq!(right_infinite_closed_interval.to_string(), String::from("[10, infinity]"));
+        assert_eq!(
+            left_infinite_open_interval.to_string(),
+            String::from("(-infinity, 10)")
+        );
+        assert_eq!(
+            right_infinite_open_interval.to_string(),
+            String::from("(10, infinity)")
+        );
+        assert_eq!(
+            left_infinite_closed_interval.to_string(),
+            String::from("[-infinity, 10]")
+        );
+        assert_eq!(
+            right_infinite_closed_interval.to_string(),
+            String::from("[10, infinity]")
+        );
     }
 
     #[test]
@@ -221,8 +255,14 @@ mod tests {
         let small_finite_interval: Interval<i16> = Interval::finite_open_interval(1, 3);
         let large_finite_interval: Interval<i16> = Interval::finite_open_interval(-100, 100);
 
-        assert_eq!(small_finite_interval.partial_cmp(&large_finite_interval), Some(Less));
-        assert_eq!(large_finite_interval.partial_cmp(&small_finite_interval), Some(Greater));
+        assert_eq!(
+            small_finite_interval.partial_cmp(&large_finite_interval),
+            Some(Less)
+        );
+        assert_eq!(
+            large_finite_interval.partial_cmp(&small_finite_interval),
+            Some(Greater)
+        );
     }
 
     #[test]
@@ -230,8 +270,14 @@ mod tests {
         let small_infinite_interval: Interval<i8> = Interval::left_infinite_open_interval(1);
         let large_infinite_interval: Interval<i8> = Interval::right_infinite_closed_interval(100);
 
-        assert_eq!(small_infinite_interval.partial_cmp(&large_infinite_interval), Some(Equal));
-        assert_eq!(large_infinite_interval.partial_cmp(&small_infinite_interval), Some(Equal));
+        assert_eq!(
+            small_infinite_interval.partial_cmp(&large_infinite_interval),
+            Some(Equal)
+        );
+        assert_eq!(
+            large_infinite_interval.partial_cmp(&small_infinite_interval),
+            Some(Equal)
+        );
     }
 
     #[test]
@@ -239,7 +285,10 @@ mod tests {
         let finite_interval: Interval<i8> = Interval::finite_open_interval(1, 3);
         let infinite_interval: Interval<i8> = Interval::left_infinite_open_interval(1);
 
-        assert_eq!(infinite_interval.partial_cmp(&finite_interval), Some(Greater));
+        assert_eq!(
+            infinite_interval.partial_cmp(&finite_interval),
+            Some(Greater)
+        );
         assert_eq!(finite_interval.partial_cmp(&infinite_interval), Some(Less));
     }
 }
