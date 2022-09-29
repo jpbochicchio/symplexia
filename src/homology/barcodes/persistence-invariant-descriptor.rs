@@ -5,7 +5,7 @@ pub mod persistence_invariant_descriptor {
     use std::fmt::Debug;
     use std::hash::Hash;
 
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug, Clone)]
     pub struct PersistenceInvariantDescriptor<I, G> {
         pub intervals: HashMap<u32, Vec<I>>,
         pub generators: HashMap<u32, Vec<G>>,
@@ -21,19 +21,23 @@ pub mod persistence_invariant_descriptor {
             Self {
                 intervals: HashMap::new(),
                 generators: HashMap::new(),
-                interval_generator_pairs: HashMap::new()
+                interval_generator_pairs: HashMap::new(),
             }
         }
 
         pub fn add_interval(&mut self, dimension: u32, interval: I, generator: G) {
             Self::insert_to_vec_if_exists(dimension, interval.clone(), &mut self.intervals);
             Self::insert_to_vec_if_exists(dimension, generator.clone(), &mut self.generators);
-            Self::insert_to_vec_if_exists(dimension, (interval, generator), &mut self.interval_generator_pairs);
+            Self::insert_to_vec_if_exists(
+                dimension,
+                (interval, generator),
+                &mut self.interval_generator_pairs,
+            );
         }
 
         pub fn get_dimensions(self) -> Vec<u32> {
             let mut dim_set: Vec<u32> = Vec::new();
-            
+
             self.intervals.keys().for_each(|k| {
                 dim_set.push(*k);
             });
@@ -53,21 +57,32 @@ pub mod persistence_invariant_descriptor {
             Self::get_or_default(dimension, &mut self.interval_generator_pairs)
         }
 
-        fn insert_to_vec_if_exists<T, U>(k: T, v: U, map: &mut HashMap<T, Vec<U>>) where U: Clone, T: Eq + Hash {
+        fn insert_to_vec_if_exists<T, U>(k: T, v: U, map: &mut HashMap<T, Vec<U>>)
+        where
+            U: Clone,
+            T: Eq + Hash,
+        {
             match map.entry(k) {
-                Vacant(e) => { e.insert(vec![v.clone()]); },
-                Occupied(mut e) => { e.get_mut().push(v); }
-            }   
+                Vacant(e) => {
+                    e.insert(vec![v.clone()]);
+                }
+                Occupied(mut e) => {
+                    e.get_mut().push(v);
+                }
+            }
         }
 
-        fn get_or_default<T, U>(k: T, map: &mut HashMap<T, Vec<U>>) -> Vec<U> where U: Clone, T: Eq + Hash {
+        fn get_or_default<T, U>(k: T, map: &mut HashMap<T, Vec<U>>) -> Vec<U>
+        where
+            U: Clone,
+            T: Eq + Hash,
+        {
             match map.entry(k) {
-                Vacant(_) => { Vec::new() },
-                Occupied(e) => { e.get().clone() }
+                Vacant(_) => Vec::new(),
+                Occupied(e) => e.get().clone(),
             }
         }
     }
-    
 }
 
 #[cfg(test)]
