@@ -17,4 +17,5 @@ crate-type = ["lib"]
 status = "actively-developed"
 
 [dependencies]
-# Pure rust baby, no dependencies required!
+lazy_static = "1.4.0"
+mut_static = "5.0.0"
