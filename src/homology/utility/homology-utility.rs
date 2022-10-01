@@ -1,12 +1,3 @@
-/*
-Might want to reference this utility with MutStatic
-
-#[macro_use]
-extern crate lazy_static;
-extern crate mut_static;
-use mut_static::MutStatic;
-*/
-
 pub mod homology_utility {
     pub struct HomologyUtility {
         default_boundary_coefficients: Vec<Vec<i32>>,
@@ -71,8 +62,26 @@ pub mod homology_utility {
                     old_index += 1;
                 }
             }
-
             return res;
+        }
+
+        pub fn vector_compare(v_1: Vec<i32>, v_2: Vec<i32>) -> i32 {
+            let l1: usize = v_1.len();
+            let l2: usize = v_2.len();
+
+            if l1 > l2 {
+                return 1;
+            } else if l1 < l2 {
+                return -1;
+            }
+
+            for i in 0..l1 {
+                if v_1[i] != v_2[i] {
+                    return v_1[i] - v_2[i];
+                }
+            }
+
+            return 0;
         }
     }
 }

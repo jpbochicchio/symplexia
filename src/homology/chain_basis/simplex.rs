@@ -1,3 +1,5 @@
+// Might make sense to use the comparator crate instead of monkeying around
+// with PartialEq and PartialOrd implementations.
 pub mod simplex {
     use std::ops::Range;
     use std::sync::Mutex;
