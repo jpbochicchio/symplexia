@@ -57,5 +57,22 @@ pub mod homology_utility {
 
             return boundary_coefficients;
         }
+
+        pub fn remove_index(arr: Vec<i32>, index: u32) -> Vec<i32> {
+            let mut res: Vec<i32> = Vec::new();
+            let (mut new_index, mut old_index) = (0 as u32, 0 as u32);
+
+            while old_index < arr.len() as u32 {
+                if old_index == index { 
+                    old_index += 1; 
+                } else {
+                    res[new_index as usize] = *arr.get(old_index as usize).unwrap();
+                    new_index += 1;
+                    old_index += 1;
+                }
+            }
+
+            return res;
+        }
     }
 }

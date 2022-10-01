@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 #[path = "homology/barcodes/intervals.rs"]
 mod intervals;
 
